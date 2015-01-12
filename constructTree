@@ -1,0 +1,144 @@
+/*
+ * To change this template, choose Tools | Templates
+ * and open the template in the editor.
+ */
+
+/**
+ *
+ * @author hp
+ */
+import java.util.*;
+public class constructTree {
+    public static void main(String [] args){
+        int [] arr = {7,2,9,6,3,5,1};
+        binarySearchTree myTree = new binarySearchTree();
+        for(Integer x: arr)
+            myTree.insert(x);
+        ArrayList <Integer> inOrder = myTree.inOrder();
+        ArrayList <Integer> postOrder = myTree.postOrder();
+        
+        System.out.println("");
+       binarySearchTree constructedTree = myTree.constructPost(inOrder,postOrder);
+        ArrayList<Integer> newInorder = constructedTree.inOrder();
+        ArrayList<Integer> newPreOrder = constructedTree.postOrder();
+        //7216359*/
+        
+    }
+    
+}
+class binarySearchTree{
+    private class TreeNode{
+        private int data;
+        private TreeNode left;
+        private TreeNode right;
+        
+        public TreeNode(int data){
+            this.data = data;
+        }
+    }
+    
+    private TreeNode root;
+    public binarySearchTree(){};
+    
+    public void insert(int data){
+        root = insert(root,data);
+    }
+    private TreeNode insert(TreeNode root, int data){
+        if(root == null){
+            return new TreeNode(data);
+        }
+        else if(root.data > data){
+            root.left = insert(root.left,data);
+        }
+        else if(root.data < data){
+            root.right = insert(root.right,data);
+        }
+        else {
+            
+        }
+        return root;
+    }
+    private void inOrder(TreeNode root,ArrayList<Integer> inOrder){
+        if(root != null){
+            inOrder(root.left,inOrder);
+            System.out.print(root.data +" ");
+            inOrder.add(root.data);
+            inOrder(root.right,inOrder);
+        }
+    }
+    public ArrayList<Integer> inOrder(){
+        ArrayList<Integer> inOrder = new ArrayList();
+        inOrder(root,inOrder);
+        System.out.println("");
+        return inOrder;
+    }
+    private TreeNode constructTree(ArrayList<Integer> inOrder,ArrayList<Integer> preOrder, int start, int end, int[] preOrderIndex){
+        if(start > end ){
+            return null;
+        }
+        
+        TreeNode node = new TreeNode(preOrder.get(preOrderIndex[0]));
+        preOrderIndex[0] += 1;
+        
+        if(start == end){
+            return node;
+        }
+        int inOrderIndex = inOrder.indexOf(node.data);
+        node.left = constructTree(inOrder,preOrder,start,inOrderIndex-1,preOrderIndex);
+        node.right = constructTree(inOrder,preOrder,inOrderIndex+1,end,preOrderIndex);
+        return node;
+    }
+    
+    public  binarySearchTree construct(ArrayList<Integer> inOrder, ArrayList<Integer> preOrder){
+        binarySearchTree answer = new binarySearchTree();
+        int [] arr={0};
+        answer.root = constructTree(inOrder,preOrder,0,preOrder.size()-1,arr);
+        return answer;
+    }
+    public ArrayList<Integer> preOrder(){
+        ArrayList<Integer> preOrder = new ArrayList();
+        preOrder(root,preOrder);
+        System.out.println("");
+        return preOrder;
+        
+    }
+    
+   
+    private void preOrder(TreeNode root,ArrayList<Integer> preOrder){
+        if(root != null){
+            System.out.print(root.data +" ");
+            preOrder.add(root.data);
+            preOrder(root.left,preOrder);
+            preOrder(root.right,preOrder);
+        }
+    }
+    public ArrayList<Integer> postOrder(){
+        ArrayList<Integer> postOrder = new ArrayList();
+        postOrder(root,postOrder);
+        System.out.println("");
+        return postOrder;
+    }
+    private void postOrder(TreeNode root, ArrayList<Integer> postOrder){
+        if(root != null){
+            postOrder(root.left,postOrder);
+            postOrder(root.right,postOrder);
+            System.out.print(root.data+" ");
+            postOrder.add(root.data);
+        }
+    }
+    public binarySearchTree constructPost(ArrayList<Integer> inOrder, ArrayList<Integer> postOrder){
+        binarySearchTree answer = new binarySearchTree();
+        answer.root = constructFromPost(inOrder,0,inOrder.size()-1,postOrder,0,postOrder.size()-1);
+        return answer;
+    }
+    private TreeNode constructFromPost(ArrayList<Integer> inOrder, int inStart, int inEnd, ArrayList<Integer> postOrder, int postStart, int postEnd){
+        if(inStart > inEnd || postStart > postEnd){
+            return null;
+        }
+        TreeNode node = new TreeNode(postOrder.get(postEnd));
+        int inOrderIndex = inOrder.indexOf(node.data);
+        node.left = constructFromPost(inOrder,inStart,inOrderIndex -1,postOrder,postStart,postStart+inOrderIndex-(inStart+1));
+        node.right = constructFromPost(inOrder,inOrderIndex +1, inEnd, postOrder,postStart+inOrderIndex-inStart,postEnd-1);
+        return node;
+    }
+}
